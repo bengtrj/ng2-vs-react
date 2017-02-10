@@ -1,0 +1,6 @@
+<h2>{{menuTitle}}</h2>
+<ul class="items">
+  <li *ngFor="let menuItem of items">
+    <app-menu-item [item]="menuItem"></app-menu-item>
+  </li>
+</ul>
