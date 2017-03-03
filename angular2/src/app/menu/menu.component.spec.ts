@@ -8,50 +8,72 @@ import {MenuItemService} from './data/item.service';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/observable/of';
 
-fdescribe('MenuItemComponent', () => {
+describe('MenuComponent', () => {
 
   let fixture: ComponentFixture<MenuComponent>;
   let component: MenuComponent;
   let compiled: HTMLElement;
 
-  class MenuItemServiceMock {
-    getItems(): Observable<Item[]> {
-      return Observable.of([]);
-    }
-  };
+  function setUp(items: Item[]) {
 
-  beforeEach(() => {
+    const menuItemServiceMock = jasmine.createSpyObj('MenuItemServiceMock', ['getItems']);
+    menuItemServiceMock.getItems.and.returnValue(Observable.of(items));
 
-
+    const override = {
+      set: {
+        providers: [
+          {provide: MenuItemService, useValue: menuItemServiceMock}
+        ]
+      }
+    };
 
     TestBed.configureTestingModule({
       declarations: [
         MenuComponent,
         MenuItemComponent
       ]
-    }).overrideComponent(MenuComponent, {
-      set: {
-        providers: [
-          {provide: MenuItemService, useClass: MenuItemServiceMock}
-        ]
-      }
-    });
+    }).overrideComponent(MenuComponent, override)
+      .overrideComponent(MenuItemComponent, override);
 
     fixture = TestBed.createComponent(MenuComponent);
     component = fixture.debugElement.componentInstance;
-
     compiled = fixture.debugElement.nativeElement;
+    fixture.detectChanges();
+
+  }
+
+  describe('MenuItemComponent with empty list of items', () => {
+
+    beforeEach(() => {
+      setUp([] as Item[]);
+    });
+
+    it(`should have as title 'Lunch Menu'`, async(() => {
+      expect(component.menuTitle).toEqual('Lunch Menu');
+      expect(compiled.querySelector('h2').textContent).toContain('Lunch Menu');
+    }));
+
+    it('should have no items listed', async(() => {
+      expect(component.items).toEqual([]);
+      expect(compiled.querySelectorAll('li').length).toBe(0);
+    }));
+
   });
 
-  it('should create the component', async(() => {
-    fixture.detectChanges();
-    expect(component).toBeTruthy();
-  }));
+  describe('MenuItemComponent with items', () => {
 
-  it(`should have as title 'Lunch Menu'`, async(() => {
-    fixture.detectChanges();
-    expect(component.menuTitle).toEqual('Lunch Menu');
-    expect(compiled.querySelector('h2').textContent).toContain('Lunch Menu');
-  }));
+    beforeEach(() => {
+      setUp([
+        {id: 11, name: 'Salmon Sushi', price: 10.99},
+        {id: 12, name: 'Salmon Nigiri', price: 11.99},
+        {id: 13, name: 'Tuna Sushi', price: 12.99}
+      ]);
+    });
+
+    it('should have no items listed', async(() => {
+      expect(compiled.querySelectorAll('li').length).toBe(3);
+    }));
+
+  });
 
 });

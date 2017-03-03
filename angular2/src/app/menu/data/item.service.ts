@@ -3,6 +3,7 @@ import {Item} from '../item/item.model';
 import {Http, Response} from '@angular/http';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
+import Any = jasmine.Any;
 
 @Injectable()
 export class MenuItemService {
@@ -17,6 +18,13 @@ export class MenuItemService {
           return res.json() as Item[];
         }
       );
+  }
+
+  orderItem(item: Item): void {
+    this.http.post('http://localhost:8080/menu/order', {
+      orderId: '1',
+      itemId: item.id
+    }).subscribe((response) => console.log(response.json()), (error: Any) => console.log(error), null);
   }
 
 }

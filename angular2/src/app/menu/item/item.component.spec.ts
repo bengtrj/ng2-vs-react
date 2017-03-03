@@ -1,21 +1,33 @@
 /* tslint:disable:no-unused-variable */
 
-import {TestBed, async, ComponentFixture} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {MenuItemComponent} from './item.component';
 import {Item} from './item.model';
+import {MenuItemService} from '../data/item.service';
+import 'rxjs/add/observable/of';
 
 describe('MenuItemComponent', () => {
 
   let fixture: ComponentFixture<MenuItemComponent>;
   let component: MenuItemComponent;
   let compiled: HTMLElement;
+  let menuItemServiceMock;
 
   beforeEach(async(() => {
+
+    menuItemServiceMock = jasmine.createSpyObj('MenuItemServiceMock', ['orderItem']);
+
     TestBed.configureTestingModule({
       declarations: [
         MenuItemComponent
-      ],
-    }).compileComponents();
+      ]
+    }).overrideComponent(MenuItemComponent, {
+      set: {
+        providers: [
+          {provide: MenuItemService, useValue: menuItemServiceMock}
+        ]
+      }
+    });
   }));
 
   beforeEach(() => {
@@ -53,15 +65,11 @@ describe('MenuItemComponent', () => {
   }));
 
   it('should add item to order when user clicks Order Button', async(() => {
-    // expect(component.selectedItem).toBe(undefined);
-    //
-    // const items = fixture.debugElement.queryAll(By.css('li'));
-    //
-    // items[0].triggerEventHandler('click', null);
-    // expect(component.selectedItem).toEqual({ id: 11, name: 'Salmon Sushi', price: 10.99 });
-    //
-    // items[1].triggerEventHandler('click', null);
-    // expect(component.selectedItem).toEqual({ id: 12, name: 'Salmon Nigiri', price: 11.99 });
+    const orderButton = fixture.nativeElement.querySelector('.button');
+
+    orderButton.click();
+    expect(menuItemServiceMock.orderItem).toHaveBeenCalled();
+
   }));
 
 });

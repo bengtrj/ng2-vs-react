@@ -6,7 +6,7 @@ import {MenuItemService} from './item.service';
 import {MockBackend, MockConnection} from '@angular/http/testing';
 import {Item} from '../item/item.model';
 import {
-  BaseRequestOptions, ConnectionBackend, Http, HttpModule, Response, ResponseOptions,
+  BaseRequestOptions, Http, HttpModule, Response, ResponseOptions,
   XHRBackend
 } from '@angular/http';
 
@@ -15,13 +15,14 @@ describe('MenuItemComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      imports: [ HttpModule ],
+      imports: [HttpModule],
       providers: [
         {provide: XHRBackend, useExisting: MockBackend},
         MenuItemService,
         MockBackend,
         BaseRequestOptions,
-        { provide: Http,
+        {
+          provide: Http,
           useFactory: (backend: MockBackend, options: BaseRequestOptions) => new Http(backend, options),
           deps: [MockBackend, BaseRequestOptions]
         }
@@ -49,6 +50,31 @@ describe('MenuItemComponent', () => {
         expect(items[0].id).toBe(11);
       });
 
-    }));
+    })
+  );
+
+  it('should post a new item when orderItem is called',
+    inject([XHRBackend, MenuItemService], (mockBackend, service: MenuItemService) => {
+
+      mockBackend.connections.subscribe(
+        (connection: MockConnection) => {
+          connection.mockRespond(new Response(
+            new ResponseOptions({
+                status: 201
+              }
+            )));
+
+          expect(JSON.parse(connection.request.getBody()))
+            .toEqual({
+              orderId: 1,
+              itemId: 11
+            });
+
+        });
+
+      service.orderItem({id: 11, name: 'Salmon Sushi', price: 10.99});
+
+    })
+  );
 
 });

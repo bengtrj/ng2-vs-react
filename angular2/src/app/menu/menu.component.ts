@@ -10,7 +10,7 @@ import {Item} from './item/item.model';
 })
 export class MenuComponent implements OnInit {
   menuTitle = 'Lunch Menu';
-  items: Item[] = new Item[0];
+  items: Item[] = [];
 
   constructor(private menuItemService: MenuItemService) {
   }

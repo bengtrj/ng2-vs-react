@@ -6,6 +6,9 @@ import {MenuItemComponent} from './menu/item/item.component';
 import {BrowserModule} from '@angular/platform-browser';
 import {FormsModule} from '@angular/forms';
 import {HttpModule} from '@angular/http';
+import {MenuItemService} from './menu/data/item.service';
+import {Observable} from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
 
 describe('AppComponent', () => {
 
@@ -14,6 +17,10 @@ describe('AppComponent', () => {
   let compiled: HTMLElement;
 
   beforeEach(() => {
+
+    const menuItemServiceMock = jasmine.createSpyObj('MenuItemServiceMock', ['getItems']);
+    menuItemServiceMock.getItems.and.returnValue(Observable.of([]));
+
     TestBed.configureTestingModule({
       declarations: [
         AppComponent,
@@ -25,6 +32,12 @@ describe('AppComponent', () => {
         FormsModule,
         HttpModule
       ]
+    }).overrideComponent(MenuComponent, {
+      set: {
+        providers: [
+          {provide: MenuItemService, useValue: menuItemServiceMock}
+        ]
+      }
     });
     TestBed.compileComponents();
 
